@@ -1,0 +1,160 @@
+=================
+Basic Instructions
+=================
+
+; This is a comment
+mov eax, 1
+add ecx, 12h
+sub eax, ebx
+
+---
+
+(source_file
+  (comment)
+  (instruction
+    (mnemonic)
+    (operand_list
+      (operand
+        (register))
+      (operand
+        (number))))
+  (instruction
+    (mnemonic)
+    (operand_list
+      (operand
+        (register))
+      (operand
+        (number))))
+  (instruction
+    (mnemonic)
+    (operand_list
+      (operand
+        (register))
+      (operand
+        (register)))))
+
+=================
+Labels
+=================
+
+start:
+    mov eax, 1
+.local:
+    add ecx, 12h
+@@:
+    jmp @b
+
+---
+
+(source_file
+  (label_definition
+    (identifier))
+  (instruction
+    (mnemonic)
+    (operand_list
+      (operand
+        (register))
+      (operand
+        (number))))
+  (label_definition)
+  (instruction
+    (mnemonic)
+    (operand_list
+      (operand
+        (register))
+      (operand
+        (number))))
+  (label_definition)
+  (instruction
+    (mnemonic)
+    (operand_list
+      (operand
+        (identifier)))))
+
+=================
+Directives
+=================
+
+format PE64 console
+section '.text' code readable executable
+
+org 100h
+include 'macros.inc'
+
+virtual at 0
+  _struct:
+    .field1 dd ?
+    .field2 db ?
+  sizeof_struct = $ - _struct
+end virtual
+
+---
+
+(source_file
+  (directive
+    (directive_arguments
+      (identifier)
+      (identifier)))
+  (directive
+    (directive_arguments
+      (string)
+      (identifier)
+      (identifier)
+      (identifier)))
+  (directive
+    (directive_arguments
+      (number)))
+  (include_statement
+    (string))
+  (directive
+    (directive_arguments
+      (identifier)))
+  (label_definition
+    (identifier))
+  (label_definition)
+  (directive
+    (directive_arguments
+      (register)
+      (identifier)))
+  (label_definition)
+  (directive
+    (directive_arguments
+      (register)
+      (identifier)))
+  (label_definition
+    (identifier)
+    (expression))
+  (directive))
+
+=================
+Macro Definition
+=================
+
+macro sum a, b
+{
+    mov eax, a
+    add eax, b
+}
+
+---
+
+(source_file
+  (macro_definition
+    (identifier)
+    (macro_params
+      (identifier)
+      (identifier))
+    (instruction
+      (mnemonic)
+      (operand_list
+        (operand
+          (register))
+        (operand
+          (identifier))))
+    (instruction
+      (mnemonic)
+      (operand_list
+        (operand
+          (register))
+        (operand
+          (identifier))))))

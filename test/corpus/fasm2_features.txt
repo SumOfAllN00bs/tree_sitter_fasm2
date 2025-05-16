@@ -1,0 +1,272 @@
+=================
+FASM2 Macros
+=================
+
+; FASM2 style macro with lambda
+macro times? counter, statement&
+    repeat counter
+        statement
+    end repeat
+end macro
+
+times 10, mov [edi], eax
+        add edi, 4
+
+; FASM2 style block macro
+macro struct? name
+{
+    virtual at 0
+    name:
+}
+
+macro ends?
+{
+    end virtual
+}
+
+struct POINT
+    .x dd ?
+    .y dd ?
+ends
+
+---
+
+(source_file
+  (comment)
+  (macro_definition
+    (identifier)
+    (macro_params
+      (identifier)
+      (identifier))
+    (directive)
+    (directive))
+  (instruction
+    (mnemonic)
+    (operand_list
+      (operand
+        (number))
+      (operand
+        (instruction
+          (mnemonic)
+          (operand_list
+            (operand
+              (memory_reference
+                (register)))
+            (operand
+              (register)))))))
+  (instruction
+    (mnemonic)
+    (operand_list
+      (operand
+        (register))
+      (operand
+        (number))))
+  (comment)
+  (macro_definition
+    (identifier)
+    (macro_params
+      (identifier))
+    (directive
+      (directive_arguments
+        (number)))
+    (identifier))
+  (macro_definition
+    (identifier)
+    (directive))
+  (macro_definition
+    (identifier)
+    (label_definition
+      (identifier))
+  (label_definition)
+  (directive
+    (directive_arguments
+      (identifier)))
+  (label_definition)
+  (directive
+    (directive_arguments
+      (identifier)))
+  (macro_definition))
+
+=================
+CALM Instructions
+=================
+
+calminstruction dword? value
+    match =?, value
+        compute size, 4
+        assemble db size dup ?
+    else
+        compute size, 4
+        arrange template, db value
+        assemble template
+    end match
+end calminstruction
+
+dword 12345678h
+dword ?
+
+---
+
+(source_file
+  (directive
+    (directive_arguments
+      (identifier)
+      (identifier)))
+  (directive
+    (directive_arguments
+      (identifier)
+      (identifier)))
+  (directive
+    (directive_arguments
+      (identifier)
+      (identifier)))
+  (directive
+    (directive_arguments
+      (identifier)
+      (identifier)))
+  (directive
+    (directive_arguments
+      (identifier)
+      (identifier)))
+  (directive
+    (directive_arguments
+      (identifier)))
+  (directive
+    (directive_arguments
+      (number)))
+  (directive
+    (directive_arguments
+      (identifier))))
+
+=================
+Conditional Compilation
+=================
+
+if defined DEBUG
+    display 'Debug mode enabled', 10
+    mov eax, DEBUG_LEVEL
+else if PLATFORM eq WINDOWS
+    include 'win32.inc'
+else if PLATFORM eq LINUX
+    include 'linux.inc'
+else
+    err 'Unknown platform'
+end if
+
+---
+
+(source_file
+  (directive
+    (directive_arguments
+      (identifier)
+      (identifier)))
+  (directive
+    (directive_arguments
+      (string)
+      (number)))
+  (instruction
+    (mnemonic)
+    (operand_list
+      (operand
+        (register))
+      (operand
+        (identifier))))
+  (directive
+    (directive_arguments
+      (identifier)
+      (identifier)
+      (identifier)
+      (identifier)))
+  (include_statement
+    (string))
+  (directive
+    (directive_arguments
+      (identifier)
+      (identifier)
+      (identifier)
+      (identifier)))
+  (include_statement
+    (string))
+  (directive)
+  (directive
+    (directive_arguments
+      (string)))
+  (directive))
+
+=================
+Complex Expressions
+=================
+
+mov eax, (1 + 2) * 3
+lea ebx, [eax + 4 * ecx + 10h]
+mov ecx, (1 shl 8) or (1 shl 10)
+test edx, not 0FFh
+and esi, ~(1 shl 3)
+
+; Binary, hex, octal numbers
+mov al, 01010101b
+mov bl, 0FFh
+mov cl, 377o
+
+---
+
+(source_file
+  (instruction
+    (mnemonic)
+    (operand_list
+      (operand
+        (register))
+      (operand
+        (expression))))
+  (instruction
+    (mnemonic)
+    (operand_list
+      (operand
+        (register))
+      (operand
+        (memory_reference
+          (register)
+          (expression)))))
+  (instruction
+    (mnemonic)
+    (operand_list
+      (operand
+        (register))
+      (operand
+        (expression))))
+  (instruction
+    (mnemonic)
+    (operand_list
+      (operand
+        (register))
+      (operand
+        (expression))))
+  (instruction
+    (mnemonic)
+    (operand_list
+      (operand
+        (register))
+      (operand
+        (expression))))
+  (comment)
+  (instruction
+    (mnemonic)
+    (operand_list
+      (operand
+        (register))
+      (operand
+        (number))))
+  (instruction
+    (mnemonic)
+    (operand_list
+      (operand
+        (register))
+      (operand
+        (number))))
+  (instruction
+    (mnemonic)
+    (operand_list
+      (operand
+        (register))
+      (operand
+        (number)))))

@@ -1,0 +1,129 @@
+=================
+Basic Assembly
+=================
+
+; This is a comment
+mov eax, 1
+add ecx, 2
+
+start:
+    xor eax, eax
+    
+---
+
+(source_file
+  (comment)
+  (instruction
+    (mnemonic
+      (identifier))
+    (operand_list
+      (operand
+        (expression
+          (identifier)))
+      (operand
+        (expression
+          (number)))))
+  (instruction
+    (mnemonic
+      (identifier))
+    (operand_list
+      (operand
+        (expression
+          (identifier)))
+      (operand
+        (expression
+          (number)))))
+  (label_definition
+    (identifier))
+  (instruction
+    (mnemonic
+      (identifier))
+    (operand_list
+      (operand
+        (expression
+          (identifier)))
+      (operand
+        (expression
+          (identifier))))))
+
+=================
+Directives
+=================
+
+format PE
+org 100h
+
+section '.text' code executable
+
+---
+
+(source_file
+  (directive
+    (directive_arguments
+      (expression
+        (identifier))))
+  (directive
+    (directive_arguments
+      (expression
+        (number))))
+  (directive
+    (directive_arguments
+      (string)))
+  (instruction
+    (mnemonic
+      (identifier))
+    (operand_list
+      (operand
+        (expression
+          (identifier))))))
+
+=================
+Memory References
+=================
+
+mov eax, [ebx]
+mov eax, [ebx + 4]
+mov eax, [ebx - 8]
+
+---
+
+(source_file
+  (instruction
+    (mnemonic
+      (identifier))
+    (operand_list
+      (operand
+        (expression
+          (identifier)))
+      (operand
+        (memory_reference
+          (expression
+            (identifier))))))
+  (instruction
+    (mnemonic
+      (identifier))
+    (operand_list
+      (operand
+        (expression
+          (identifier)))
+      (operand
+        (memory_reference
+          (expression
+            (expression
+              (identifier))
+            (expression
+              (number)))))))
+  (instruction
+    (mnemonic
+      (identifier))
+    (operand_list
+      (operand
+        (expression
+          (identifier)))
+      (operand
+        (memory_reference
+          (expression
+            (expression
+              (identifier))
+            (expression
+              (number))))))))

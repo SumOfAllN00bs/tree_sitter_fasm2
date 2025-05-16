@@ -1,0 +1,123 @@
+User:
+The project is going to be a tree-sitter plugin/grammar for the language fasm2. Fasm2 is an extension on top of fasmg (powerful macro system highly compatible with fasm1.73.32).
+I've installed tree-sitter and ran tree-sitter init. So the project is "initialised". I've copied the 3 main versions of fasm into the fasm directory. Fasm2, fasmg, and fasm1.73.32. Example files and documentation, as well as source code for the compilers themselves exist in these folders. I've setup git with git init. And added the current state of the directory. Then I setup a remote to keep allow for changes to be stored on github.
+The next steps will be to exhaustively go over the source files of fasm2, fasmg, and fasm1.73.32 to understand the features and elements we will need to be providing syntax analysis for. It won't just be assembly level understanding. We need to cover macro system, directives, local variables, namespaces, anonymous labels, local labels, understand the way capitalization neutral naming works, datatypes, conditional compilation, and the include system.
+We'll document everything we expect we'll be handling, and organize ourselves around incremental progress. The testing environment for the tree-sitter grammar will be to interface with neovim through nvim-treesitter.
+Our target is the language fasm2. But we'll need to be aware of compatibility between all 3 in order to know how the "dev environment" as a whole is expected to behave. Fasm2 is meant to be a more streamlined x86 assembly environment and takes advantage of the powerful macro system of fasmg. Fasmg is meant to be as compatible as possible with fasm1.73.32 whilst enabling many performance improvements and reliability improvements to the dev experience through the use of macros. While fasm1.73.32 is a mature and well tested assembly compiler with specific syntax that differs from other well established assemblers.
+Gemini:
+Okay, that's a fantastic and thorough setup! You've laid out a clear path for developing the fasm2 tree-sitter grammar, covering everything from the initial project structure with tree-sitter init and git, to the deep dive into fasm2, fasmg, and fasm1.73.32 features you've gathered in the fasm directory.
+Understanding the nuances of the macro system, directives, namespaces, local variables, different types of labels, capitalization neutrality, data types, conditional compilation, and the include system will indeed be key. Your plan to exhaustively review the sources and document everything for an incremental approach sounds perfect for tackling such a complex task. Using Neovim with nvim-treesitter for testing is a great choice for immediate feedback.
+It sounds like you're all set for the next phase of detailed analysis. I'm ready when you are! What's the first specific area or task you'd like to dive into to start building out the grammar?
+Rate this answer: 
+User:
+I think documenting all the features we can after reading the source code is the first step.
+Gemini:
+Sounds like a solid plan! Diving into the source code and documentation for fasm2, fasmg, and fasm1.73.32 to catalogue all their features is definitely the way to go before writing any grammar rules. It's a bit like mapping out the territory before drawing the map.
+As you're sifting through everything, it might be helpful to think about how these features break down from a parsing perspective. You could perhaps categorize them into:
+Lexical Elements (the "words" of the language):
+What are the keywords (instructions like mov, add; directives like db, macro, if)?
+How are identifiers (labels, variable names, macro names) formed? Pay special attention to that capitalization neutrality you mentioned.
+What kinds of literals are there (numbers in different bases, strings, character constants)?
+What operators are used (arithmetic, logical, etc.)?
+How are comments denoted?
+Any special symbols or punctuation (:, ,, (, ), [, ], etc.)?
+Syntactic Structures (the "sentences" and "paragraphs"):
+How are instructions structured (e.g., label: mnemonic operand1, operand2)?
+What's the syntax for defining data (db, dw, dd, etc.)?
+How are macros defined and invoked? What about their parameters and local symbols?
+How do procedures or local blocks work?
+What does the syntax for conditional compilation (if, else, endif, ifdef) look like?
+How are namespaces used?
+How do include statements work?
+The structure of labels (global, local like .label, anonymous like @@).
+Jotting these down, perhaps in a dedicated document with examples you find, could create a really useful blueprint for when you start defining the grammar.js file. It'll help ensure you cover all the necessary ground.
+What particular aspect of the fasm languages are you thinking of digging into first for this documentation phase? Maybe starting with the most common statement types, or perhaps the preprocessor directives?
+Rate this answer: 
+User:
+Everything.
+Gemini:
+Alright, "Everything" it is! That's ambitious, but definitely the right way to get a comprehensive understanding. To tackle this mountain of information systematically, how about we create a central document where we can log all these features? You could call it something like FASM_FEATURES.md or LANGUAGE_SPEC.md right in your project root.
+We can break down "Everything" into more manageable chunks. Here's a possible structure for that document, covering the kinds of things we'll need to define for the grammar:
+Core Assembly Syntax:
+Instructions:
+Mnemonics (e.g., mov, add, jmp)
+Operands (registers, memory addresses, immediate values)
+Addressing modes (e.g., [eax], [ebx+ecx*4+offset], fs:[edi])
+Data Definitions:
+Directives like db, dw, dd, dq, dt, du (if fasm2 uses it)
+Syntax for defining single values, arrays, strings.
+The dup operator or similar for repetitions.
+Labels:
+Global labels (e.g., my_label:)
+Local labels (e.g., .local_label:)
+Anonymous labels (e.g., @@:, @@@:, and how they are referenced @b, @f)
+Comments:
+Line comments (usually ;)
+Block comments (if any exist in fasm dialects)
+Expressions:
+Arithmetic operators (+, -, *, /, %)
+Logical operators (and, or, xor, not)
+Bitwise operators (often same as logical in asm)
+Shift operators (shl, shr)
+Comparison operators
+Operator precedence
+Parentheses for grouping ()
+Literals:
+Numbers: decimal, hexadecimal (0x... or ...h), binary (0b... or ...b), octal (if supported)
+Character constants (e.g., 'A', 'AB')
+String literals (e.g., "hello", 'world', and any escape sequences)
+Assembler Directives (Non-Macro/Preprocessor):
+Segment/Section Control: segment, section, common section names like .text, .data, .bss
+Alignment: align (and its parameters)
+Symbol Visibility/Scope: public, extrn (or extern)
+Origin: org
+Equates/Constants: equ, = (and the difference if any)
+Structure Definition: struc, ends (or struct/endstruct), member definition, istruc/at/iend for instances.
+Repeat Blocks: rept/end rept (or irp/irpc if they are distinct from macros here)
+Output Format: format PE, format ELF, format BIN, etc.
+Entry Point: entry or end start_label
+Macro System (Key for fasmg/fasm2):
+Definition: macro name [params...] / endm
+Invocation: macro_name arg1, arg2
+Parameters:
+Named vs. positional
+Default values
+Variadic arguments (e.g., ... or a special keyword)
+Greedy parameters
+Local Symbols within Macros: How are they defined/scoped to avoid clashes? (e.g., local, @@ behavior in macros)
+Macro Operators/Directives:
+Stringification (!, !!, or other syntax)
+Concatenation (& or other syntax)
+Numeric evaluation within macros
+Conditional expansion within macros (if, else, endif specific to macro processing)
+Looping constructs within macros (repeat, while)
+Predefined Macros/Symbols: (e.g., __LINE__, __FILE__, pass number)
+Macro Libraries & include behavior with macros.
+Purging macros: purge
+Preprocessor Directives (Conditional Assembly & Includes):
+Include Files: include 'filepath' (syntax for paths, quotes)
+Conditional Assembly:
+if <condition>
+ifdef <symbol>, ifndef <symbol>
+ifused <symbol>, ifnused <symbol> (fasmg specific?)
+else, elseif <condition>
+endif
+Conditions can be expressions.
+Symbol Definition/Undefinition (for preprocessor): define <symbol> [value], undef <symbol> (if distinct from equ/=)
+Message/Error Directives: display "message", err (or error)
+Pass Control: phase, end phase, fix, postpone (fasmg specific features)
+Program Structure & Organization:
+Namespaces: How are they defined (e.g., namespace name / end namespace) and how are symbols accessed (e.g., namespace.symbol)?
+Procedures/Functions: proc name [args...] / endp. How are arguments handled? Local labels within procs.
+Local Variables: Syntax for defining local variables on the stack or otherwise within procedures/scopes.
+Stack Frame Management: Any explicit directives or conventions (e.g., enter, leave are instructions, but any higher-level syntax?).
+FASM Language Family Specifics:
+Case Neutrality: Document exactly how this applies to labels, instructions, directives, macro names. Are there any exceptions?
+"Flat Assembler" Philosophy: How does this manifest in syntax or common practices?
+fasm1.73.32 Compatibility: Note any syntax or features from fasm1 that fasmg/fasm2 aim to support or deviate from.
+fasmg Enhancements: Specific directives, macro features, or syntax unique to fasmg.
+fasm2 Streamlining/Changes: What does fasm2 add, remove, or change compared to fasmg and fasm1?
+Forward References: How are they handled? Any limitations?
+Multi-pass Assembly: How does it affect what can be written? (e.g., defined() operator, symbol resolution).
+This list is pretty exhaustive, but that's the goal, right? You can start by picking a section, say "Labels" or "Data Definitions," and begin filling in the details with examples you find in the fasm source files and documentation you've gathered.
+Where would you like to begin this documentation journey? No need to do it all at once, of course!
