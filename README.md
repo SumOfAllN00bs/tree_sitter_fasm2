@@ -53,6 +53,7 @@ This grammar is currently under development. The initial phase involves:
 ## Contributing
 
 Contributions are welcome! Please feel free to submit issues or pull requests.
+Edit (this is a lie, don't believe what the AI wrote)
 
 ## License
 
