@@ -1,0 +1,41 @@
+{
+  "$schema": "https://tree-sitter.github.io/tree-sitter/assets/schemas/config.schema.json",
+  "grammars": [
+    {
+      "name": "tree_sitter_fasm2",
+      "camelcase": "TreeSitterFasm2",
+      "title": "TreeSitterFasm2",
+      "scope": "source.tree_sitter_fasm2",
+      "file-types": [
+        "fasm",
+        "inc",
+        "asm"
+      ],
+      "injection-regex": "^tree_sitter_fasm2$",
+      "class-name": "TreeSitterTreeSitterFasm2"
+    }
+  ],
+  "metadata": {
+    "version": "0.1.0",
+    "license": "MIT",
+    "description": "Parser for fasm2",
+    "authors": [
+      {
+        "name": "SumOfAllN00bs",
+        "email": "discordshards@gmail.com"
+      }
+    ],
+    "links": {
+      "repository": "https://github.com/tree-sitter/tree-sitter-tree_sitter_fasm2"
+    }
+  },
+  "bindings": {
+    "c": true,
+    "go": true,
+    "node": true,
+    "python": true,
+    "rust": true,
+    "swift": true,
+    "zig": false
+  }
+}
